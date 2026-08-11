@@ -8,6 +8,12 @@ _deps/
 .cache/
 .clangd/index/
 compile_commands.json
+/.clangd
+/.clang-format
+
+# Local-only design notes and validation material
+/demos/
+/无线HDMI投屏系统应用层软件设计方案.md
 
 # Deployment and validation scripts are kept outside the public source release.
 scripts/

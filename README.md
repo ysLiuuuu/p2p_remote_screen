@@ -35,7 +35,6 @@ LCAT HDMI-OUT ← DRM/KMS ← MPP H.264 ← UDP ──────────�
 | `src/media` | UDP 传输、MPP 编码/解码和 DRM 显示；包含 `wd_tx`、`wd_rx` |
 | `config` | GO/GC 示例配置 |
 | `docs` | 协议、媒体链路和 BLE 配网说明 |
-| `demos` | 验证报告和本地 Demo 资料 |
 | `third_party` | nlohmann/json、spdlog、wpa_supplicant 相关依赖 |
 
 公开仓库不包含实验环境部署脚本、Shell 脚本、构建目录和解压的 BlueZ 源码。
@@ -77,7 +76,8 @@ cmake --build build-lcat --target wd_rx -j$(nproc)
 - [P2P 建链协议](docs/P2P_GO与GC连接协议流程.md)
 - [BLE 配网协议](docs/蓝牙配网协议.md)
 - [媒体链路说明](docs/媒体链路使用说明.md)
-- [P2P/BLE 验证报告](demos/P2P与BLE-验证报告.md)
+
+开发板验证记录保留在本地实验资料中，不纳入公开仓库。
 
 ## 当前限制
 
