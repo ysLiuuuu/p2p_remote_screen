@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.9**（见 [VERSION](VERSION)）
+当前版本：**0.1.10**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -42,6 +42,27 @@ MPP/DRM-KMS 解码并输出 HDMI。
 | `config` | GO/GC 示例配置 |
 | `docs` | 协议和 BLE 配网说明 |
 | `third_party` | nlohmann/json、spdlog、wpa_supplicant 相关依赖 |
+
+## 构建脚本
+
+使用 `scripts/build.sh` 进行交叉编译。脚本默认使用
+`~/onvif_project/cmake/arm64-toolchain.cmake` 作为工具链，并将构建目录和产物
+放在项目根目录的 `build/` 下：
+
+```bash
+# 默认构建
+./scripts/build.sh
+
+# 删除 build/ 后全量重建
+./scripts/build.sh -c
+
+# 使用其他交叉编译工具链
+TOOLCHAIN=/path/to/arm64-toolchain.cmake ./scripts/build.sh
+```
+
+脚本默认关闭 DRM/KMS 接收端目标（`ENABLE_DRM_TARGETS=OFF`），构建完成后会检查
+`build/src/p2p_app/p2p_manager` 是否为 aarch64 可执行文件。使用前请确保工具链
+及其 sysroot 已提供项目所需的 Rockchip MPP、RGA、D-Bus 等开发文件。
 
 ## 配置
 
