@@ -29,7 +29,7 @@ MPP/DRM-KMS 解码并输出 HDMI。
 | 设备 | SoC/架构 | 系统与内核 | 项目角色 | 关键设备 |
 | --- | --- | --- | --- | --- |
 | OPI | Rockchip RK3588 / aarch64 | Debian 12；`6.1.99-rockchip-rk3588` | TX / Wi-Fi Direct GO | `/dev/video0` HDMI-IN、`/dev/rga`、`/dev/mpp_service` |
-| LCAT（野火 LubanCat） | Rockchip RK3576 / aarch64 | Debian 12；`6.1.99-rk3576` | RX / Wi-Fi Direct GC | `/dev/dri/card0`、`/dev/mpp_service`、HDMI-A-1 |
+| LCAT | Rockchip RK3576 / aarch64 | Debian 12；`6.1.99-rk3576` | RX / Wi-Fi Direct GC | `/dev/dri/card0`、`/dev/mpp_service`、HDMI-A-1 |
 | PC 编译机 | x86_64 | Ubuntu 22.04.5 | 交叉编译与部署 | 对应板卡 SDK、sysroot 和 CMake 工具链 |
 
 两块板使用 glibc 2.36。已验证的无线驱动为`rtw89_8852be`；
