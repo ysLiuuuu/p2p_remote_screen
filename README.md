@@ -27,6 +27,57 @@ OPI HDMI-IN → V4L2 → RGA → MPP H.264 → UDP          │
 LCAT HDMI-OUT ← DRM/KMS ← MPP H.264 ← UDP ───────────┘
 ```
 
+## 验证硬件与运行时环境
+
+以下信息对应当前已验证的实验环境；不同板卡镜像可能需要替换工具链、sysroot
+或动态库版本。
+
+| 设备 | SoC/架构 | 系统与内核 | 项目角色 | 关键设备 |
+| --- | --- | --- | --- | --- |
+| OPI | Rockchip RK3588 / aarch64 | Debian 12；`6.1.99-rockchip-rk3588` | TX / Wi-Fi Direct GO | `/dev/video0` HDMI-IN、`/dev/rga`、`/dev/mpp_service` |
+| LCAT（野火 LubanCat） | Rockchip RK3576 / aarch64 | Debian 12；`6.1.99-rk3576` | RX / Wi-Fi Direct GC | `/dev/dri/card0`、`/dev/mpp_service`、HDMI-A-1 |
+| PC 编译机 | x86_64 | Ubuntu 22.04.5 | 交叉编译与部署 | 对应板卡 SDK、sysroot 和 CMake 工具链 |
+
+两块板使用 glibc 2.36、little-endian ARM64 用户态。已验证的无线驱动为
+`rtw89_8852be`；OPI 默认无线接口为 `wlP2p33s0`，LCAT 默认无线接口为
+`wlan0`。运行 P2P 前需要系统的 `wpa_supplicant`/`wpa_cli`、`nl80211` 驱动
+和 BlueZ 5.66。
+
+### 动态库与系统依赖
+
+| 程序/功能 | 主要运行时依赖 | 说明 |
+| --- | --- | --- |
+| `p2p_manager` / `ble_provisioner` | `libdbus-1.so.3`、`libstdc++.so.6`、`libgcc_s.so.1`、glibc | BLE GATT 通过 system D-Bus 访问 BlueZ |
+| `wd_tx` | `librockchip_mpp.so.0`、`librga.so.2`、`libstdc++.so.6`、glibc | OPI 上完成 V4L2 采集、RGA 转换和 MPP 编码 |
+| `wd_rx` | `librockchip_mpp.so.0`、`libdrm.so.2`、`libstdc++.so.6`、glibc | LCAT 上完成 MPP 解码和 DRM/KMS 显示 |
+| BLE 运行环境 | `bluetooth.service`、BlueZ 5.66、system D-Bus | 需要注册 GATT Application 和 LE Advertisement |
+| Wi-Fi Direct 运行环境 | `wpa_supplicant`、`wpa_cli`、nl80211 | 应用通过 Unix control socket 控制 P2P |
+
+编译阶段还需要对应 sysroot 中的 `rk_mpi.h`、`im2d.h`、`xf86drm.h`、DRM
+内核头文件和 D-Bus 头文件。动态库版本应以目标板实际镜像为准，可使用：
+
+```bash
+ldd ./p2p_manager
+ldd ./wd_tx
+ldd ./wd_rx
+```
+
+### 静态依赖与动态依赖矩阵
+
+| 目标 | 项目内部静态库 | 第三方静态/header-only 依赖 | 目标板动态库 |
+| --- | --- | --- | --- |
+| `p2p_manager` | `ble_core`、`p2p_core`、`p2p_app_utils` | `spdlog` 静态库、nlohmann/json header-only | `libdbus-1.so.3`、glibc、libstdc++、libgcc_s |
+| `ble_provisioner` | `ble_core` | `spdlog` 静态库、nlohmann/json header-only | `libdbus-1.so.3`、glibc、libstdc++、libgcc_s |
+| `wd_tx` | `video_transport` | 无额外项目库 | `librockchip_mpp.so.0`、`librga.so.2`、glibc、libstdc++ |
+| `wd_rx` | `video_transport` | 无额外项目库 | `librockchip_mpp.so.0`、`libdrm.so.2`、glibc、libstdc++ |
+
+项目 CMake 默认将 `spdlog` 构建为静态库；`nlohmann/json` 只提供头文件，
+不会产生运行时动态库；`video_transport`、`p2p_core`、`ble_core` 和
+`p2p_app_utils` 也都是项目内部静态库，最终链接进对应可执行文件。
+
+此外，运行时还需要外部进程/服务：`wpa_supplicant`、`bluetoothd`、
+`bluetooth.service` 和 system D-Bus。它们不是由本项目静态链接或打包的库。
+
 ## 目录
 
 | 路径 | 内容 |
