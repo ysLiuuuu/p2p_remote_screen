@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.6 — 2026-08-11
+
+- 使用 GPT 绘制并加入无线 HDMI 投屏系统结构图，替换 README 中的 Mermaid 图。
+
 ## 0.1.5 — 2026-08-11
 
 - 用 Mermaid 系统结构图替换 README 中的 ASCII 结构描述。
