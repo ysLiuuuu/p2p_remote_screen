@@ -31,7 +31,7 @@ LCAT HDMI-OUT ← DRM/KMS ← MPP H.264 ← UDP ──────────�
 
 | 路径 | 内容 |
 | --- | --- |
-| `src/p2p_app` | BLE、P2P 和系统工具；包含 `p2p_manager`、`ble_provisioner`、`ble_config_tui` |
+| `src/p2p_app` | BLE、P2P 和系统工具；包含 `p2p_manager`、`ble_provisioner` |
 | `src/media` | UDP 传输、MPP 编码/解码和 DRM 显示；包含 `wd_tx`、`wd_rx` |
 | `config` | GO/GC 示例配置 |
 | `docs` | 协议、媒体链路和 BLE 配网说明 |
@@ -73,7 +73,6 @@ cmake --build build-lcat --target wd_rx -j$(nproc)
 
 - [GO 配置](config/go.json)
 - [GC 配置](config/gc.json)
-- [P2P 建链协议](docs/P2P_GO与GC连接协议流程.md)
 - [BLE 配网协议](docs/蓝牙配网协议.md)
 - [媒体链路说明](docs/媒体链路使用说明.md)
 

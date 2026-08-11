@@ -1,7 +1,7 @@
 # p2p_app：应用入口、BLE、Wi-Fi Direct、系统工具和显示演示。
 set(P2P_APP_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
-# BLE 服务和 BLE TUI 都通过 libdbus 直接访问 BlueZ。
+# BLE 服务通过 libdbus 直接访问 BlueZ。
 if(CMAKE_CROSSCOMPILING)
     # 两块板的运行时 rootfs 有 libdbus-1.so.3，但未安装 -dev 包（没有
     # libdbus-1.so 链接名）。交叉编译时直接链接 SONAME 文件；API 头文件
@@ -64,12 +64,3 @@ target_link_libraries(ble_provisioner PRIVATE
     ble_core
     spdlog::spdlog
     nlohmann_json::nlohmann_json)
-
-# 独立 BLE 扫描、连接和配网终端。
-add_executable(ble_config_tui ble/tui_main.cpp)
-if(CMAKE_CROSSCOMPILING)
-    target_include_directories(ble_config_tui PRIVATE ${DBUS_INCLUDE_DIRS})
-endif()
-target_link_libraries(ble_config_tui PRIVATE
-    nlohmann_json::nlohmann_json
-    ${DBUS_TARGET})
