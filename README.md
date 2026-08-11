@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.7**（见 [VERSION](VERSION)）
+当前版本：**0.1.8**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -44,7 +44,7 @@ MPP/DRM-KMS 解码并输出 HDMI。
 | `src/p2p_app` | BLE、P2P 和系统工具；包含 `p2p_manager`、`ble_provisioner` |
 | `src/media` | UDP 传输、MPP 编码/解码和 DRM 显示；包含 `wd_tx`、`wd_rx` |
 | `config` | GO/GC 示例配置 |
-| `docs` | 协议、媒体链路和 BLE 配网说明 |
+| `docs` | 协议和 BLE 配网说明 |
 | `third_party` | nlohmann/json、spdlog、wpa_supplicant 相关依赖 |
 
 公开仓库不包含实验环境部署脚本、Shell 脚本、构建目录和解压的 BlueZ 源码。
@@ -84,7 +84,6 @@ cmake --build build-lcat --target wd_rx -j$(nproc)
 - [GO 配置](config/go.json)
 - [GC 配置](config/gc.json)
 - [BLE 配网协议](docs/蓝牙配网协议.md)
-- [媒体链路说明](docs/媒体链路使用说明.md)
 
 开发板验证记录保留在本地实验资料中，不纳入公开仓库。
 
