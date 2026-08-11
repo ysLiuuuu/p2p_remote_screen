@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.11**（见 [VERSION](VERSION)）
+当前版本：**0.1.0**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
