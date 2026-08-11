@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.10**（见 [VERSION](VERSION)）
+当前版本：**0.1.11**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -46,7 +46,7 @@ MPP/DRM-KMS 解码并输出 HDMI。
 ## 构建脚本
 
 使用 `scripts/build.sh` 进行交叉编译。脚本默认使用
-`~/onvif_project/cmake/arm64-toolchain.cmake` 作为工具链，并将构建目录和产物
+`~/path/cmake/arm64-toolchain.cmake` 作为工具链，并将构建目录和产物
 放在项目根目录的 `build/` 下：
 
 ```bash

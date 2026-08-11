@@ -5,7 +5,7 @@
 set -e
 DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$DIR/.." && pwd)"
-TOOLCHAIN="${TOOLCHAIN:-$HOME/onvif_project/cmake/arm64-toolchain.cmake}"
+TOOLCHAIN="${TOOLCHAIN:-$HOME/path/cmake/arm64-toolchain.cmake}"
 BUILD="$ROOT/build"
 
 if [ "${1:-}" = "-c" ] && [ -d "$BUILD" ]; then
@@ -18,5 +18,5 @@ echo "==> cmake build (-j$(nproc))"
 cmake --build "$BUILD" -j"$(nproc)"
 
 BIN="$BUILD/src/p2p_app/p2p_manager"
-file "$BIN" | grep -q aarch64 || { echo "❌ build failed (not aarch64 ELF)"; exit 1; }
-echo "✅ built: $BIN"
+file "$BIN" | grep -q aarch64 || { echo "build failed (not aarch64 ELF)"; exit 1; }
+echo "built: $BIN"

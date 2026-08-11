@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.11 — 2026-08-11
+
+- 清理构建脚本中的 emoji 输出。
+- 将默认工具链路径中的 `onvif_project` 改为 `path`。
+
 ## 0.1.10 — 2026-08-11
 
 - 在 README 中补充 `scripts/build.sh` 的使用方法和构建前提。
