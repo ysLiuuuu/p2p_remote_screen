@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.8**（见 [VERSION](VERSION)）
+当前版本：**0.1.9**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -15,7 +15,7 @@ MPP/DRM-KMS 解码并输出 HDMI。
 - Rockchip MPP H.264 硬件编码和解码
 - RGA DMA-BUF 图像格式转换
 - DRM/KMS Plane 直接输出 HDMI
-- 自定义低延迟 UDP 帧分片协议（`WDHM`）
+- 自定义低延迟 UDP 帧分片协议
 
 ## 系统结构
 
@@ -32,11 +32,7 @@ MPP/DRM-KMS 解码并输出 HDMI。
 | LCAT（野火 LubanCat） | Rockchip RK3576 / aarch64 | Debian 12；`6.1.99-rk3576` | RX / Wi-Fi Direct GC | `/dev/dri/card0`、`/dev/mpp_service`、HDMI-A-1 |
 | PC 编译机 | x86_64 | Ubuntu 22.04.5 | 交叉编译与部署 | 对应板卡 SDK、sysroot 和 CMake 工具链 |
 
-两块板使用 glibc 2.36、little-endian ARM64 用户态。已验证的无线驱动为
-`rtw89_8852be`；OPI 默认无线接口为 `wlP2p33s0`，LCAT 默认无线接口为
-`wlan0`。运行 P2P 前需要系统的 `wpa_supplicant`/`wpa_cli`、`nl80211` 驱动
-和 BlueZ 5.66。
-
+两块板使用 glibc 2.36。已验证的无线驱动为`rtw89_8852be`；
 ## 目录
 
 | 路径 | 内容 |
@@ -47,45 +43,11 @@ MPP/DRM-KMS 解码并输出 HDMI。
 | `docs` | 协议和 BLE 配网说明 |
 | `third_party` | nlohmann/json、spdlog、wpa_supplicant 相关依赖 |
 
-公开仓库不包含实验环境部署脚本、Shell 脚本、构建目录和解压的 BlueZ 源码。
-
-## 构建
-
-### P2P/BLE 应用
-
-```bash
-cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/path/to/aarch64-toolchain.cmake \
-  -DENABLE_DRM_TARGETS=OFF
-cmake --build build -j$(nproc)
-```
-
-产物位于 `build/src/p2p_app/`。
-
-### 媒体链路
-
-媒体程序需要对应板卡的 Rockchip MPP、RGA、DRM 头文件和运行库。分别使用
-OPI 和 LCAT 的交叉工具链配置：
-
-```bash
-cmake -S . -B build-opi \
-  -DCMAKE_TOOLCHAIN_FILE=/path/to/opi-toolchain.cmake \
-  -DENABLE_DRM_TARGETS=OFF
-cmake --build build-opi --target wd_tx -j$(nproc)
-
-cmake -S . -B build-lcat \
-  -DCMAKE_TOOLCHAIN_FILE=/path/to/lcat-toolchain.cmake \
-  -DENABLE_DRM_TARGETS=ON
-cmake --build build-lcat --target wd_rx -j$(nproc)
-```
-
 ## 配置
 
 - [GO 配置](config/go.json)
 - [GC 配置](config/gc.json)
 - [BLE 配网协议](docs/蓝牙配网协议.md)
-
-开发板验证记录保留在本地实验资料中，不纳入公开仓库。
 
 ## 版本管理
 
