@@ -1,0 +1,14 @@
+{
+  "role": "gc",
+  "ctrl_dir": "/var/run/wd_p2p",
+  "iface": "wlan0",
+  "device_name": "WD-LCAT-RX",
+  "loop_sec": 0,
+  "ble_enabled": true,
+  "ble_adapter": "hci0",
+  "ble_name": "WD-LCAT-RX",
+  "gc": {
+    "go_devname": "WD-OPI-TX",
+    "fallback_ip": "192.168.49.100/24"
+  }
+}

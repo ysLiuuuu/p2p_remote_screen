@@ -1,0 +1,13 @@
+{
+  "role": "go",
+  "ctrl_dir": "/var/run/wd_p2p",
+  "iface": "wlP2p33s0",
+  "device_name": "WD-OPI-TX",
+  "loop_sec": 0,
+  "ble_enabled": true,
+  "ble_adapter": "hci0",
+  "ble_name": "WD-OPI-TX",
+  "go": {
+    "ip": "192.168.49.1/24"
+  }
+}

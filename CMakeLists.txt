@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.14)
+
+set(WIRELESS_DISPLAY_VERSION "0.1.0")
+if(EXISTS "${CMAKE_SOURCE_DIR}/VERSION")
+    file(READ "${CMAKE_SOURCE_DIR}/VERSION" WIRELESS_DISPLAY_VERSION)
+    string(STRIP "${WIRELESS_DISPLAY_VERSION}" WIRELESS_DISPLAY_VERSION)
+endif()
+
+project(wireless_display VERSION ${WIRELESS_DISPLAY_VERSION} LANGUAGES CXX C)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+option(ENABLE_DRM_TARGETS "Build DRM/KMS receiver and display demos" ON)
+
+add_subdirectory(third_party)
+add_subdirectory(src)

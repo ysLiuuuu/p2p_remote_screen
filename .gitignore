@@ -1,0 +1,24 @@
+build*/
+_deps/
+*.o
+*.a
+*.tar.xz
+
+# Local IDE and generated files
+.cache/
+.clangd/index/
+compile_commands.json
+
+# Deployment and validation scripts are kept outside the public source release.
+scripts/
+**/*.sh
+
+# Extracted demo dependencies; use the archive locally when needed.
+demos/ble/bluez-5.66/
+
+# Do not publish nested repository metadata from vendored sources.
+**/.git/
+
+# Local logs and deployment overrides
+*.local
+*.log
