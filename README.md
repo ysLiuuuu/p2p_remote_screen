@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.5**（见 [VERSION](VERSION)）
+当前版本：**0.1.7**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -19,48 +19,12 @@ MPP/DRM-KMS 解码并输出 HDMI。
 
 ## 系统结构
 
-```mermaid
-flowchart LR
-    BLE["BLE GATT 配网"]
-    BLUEZ["BlueZ 5.66<br/>system D-Bus"]
-
-    subgraph TX["OPI / RK3588 · 发射端"]
-        TXP2P["p2p_manager<br/>Wi-Fi Direct GO"]
-        IN["HDMI-IN<br/>V4L2 /dev/video0"]
-        RGA["RGA<br/>DMA-BUF → NV12"]
-        ENC["Rockchip MPP<br/>H.264 编码"]
-    end
-
-    subgraph LINK["Wi-Fi Direct IP 链路"]
-        UDP["WDHM UDP<br/>H.264 帧分片 / 重组"]
-    end
-
-    subgraph RX["LCAT / RK3576 · 接收端"]
-        RXP2P["p2p_manager<br/>Wi-Fi Direct GC"]
-        DEC["Rockchip MPP<br/>H.264 解码"]
-        DRM["DRM/KMS<br/>NV12 Plane"]
-        OUT["HDMI-OUT<br/>HDMI-A-1"]
-    end
-
-    BLE <--> BLUEZ
-    BLE --> TXP2P
-    BLE --> RXP2P
-    TXP2P <-->|P2P 建链 / IP 配置| RXP2P
-    TXP2P -. 控制面 .-> UDP
-    IN --> RGA --> ENC --> UDP --> DEC --> DRM --> OUT
-
-    classDef control fill:#e8f1ff,stroke:#3973b8,color:#16324f
-    classDef media fill:#eaf7ee,stroke:#3a8f5b,color:#173d25
-    classDef service fill:#fff4df,stroke:#b87918,color:#4d3108
-    class BLE,TXP2P,RXP2P control
-    class IN,RGA,ENC,UDP,DEC,DRM,OUT media
-    class BLUEZ service
-```
+![无线 HDMI 投屏系统结构图](docs/system-architecture.png)
 
 ## 验证硬件与运行时环境
 
 以下信息对应当前已验证的实验环境；不同板卡镜像可能需要替换工具链、sysroot
-或动态库版本。
+或系统版本。
 
 | 设备 | SoC/架构 | 系统与内核 | 项目角色 | 关键设备 |
 | --- | --- | --- | --- | --- |
@@ -72,41 +36,6 @@ flowchart LR
 `rtw89_8852be`；OPI 默认无线接口为 `wlP2p33s0`，LCAT 默认无线接口为
 `wlan0`。运行 P2P 前需要系统的 `wpa_supplicant`/`wpa_cli`、`nl80211` 驱动
 和 BlueZ 5.66。
-
-### 动态库与系统依赖
-
-| 程序/功能 | 主要运行时依赖 | 说明 |
-| --- | --- | --- |
-| `p2p_manager` / `ble_provisioner` | `libdbus-1.so.3`、`libstdc++.so.6`、`libgcc_s.so.1`、glibc | BLE GATT 通过 system D-Bus 访问 BlueZ |
-| `wd_tx` | `librockchip_mpp.so.0`、`librga.so.2`、`libstdc++.so.6`、glibc | OPI 上完成 V4L2 采集、RGA 转换和 MPP 编码 |
-| `wd_rx` | `librockchip_mpp.so.0`、`libdrm.so.2`、`libstdc++.so.6`、glibc | LCAT 上完成 MPP 解码和 DRM/KMS 显示 |
-| BLE 运行环境 | `bluetooth.service`、BlueZ 5.66、system D-Bus | 需要注册 GATT Application 和 LE Advertisement |
-| Wi-Fi Direct 运行环境 | `wpa_supplicant`、`wpa_cli`、nl80211 | 应用通过 Unix control socket 控制 P2P |
-
-编译阶段还需要对应 sysroot 中的 `rk_mpi.h`、`im2d.h`、`xf86drm.h`、DRM
-内核头文件和 D-Bus 头文件。动态库版本应以目标板实际镜像为准，可使用：
-
-```bash
-ldd ./p2p_manager
-ldd ./wd_tx
-ldd ./wd_rx
-```
-
-### 静态依赖与动态依赖矩阵
-
-| 目标 | 项目内部静态库 | 第三方静态/header-only 依赖 | 目标板动态库 |
-| --- | --- | --- | --- |
-| `p2p_manager` | `ble_core`、`p2p_core`、`p2p_app_utils` | `spdlog` 静态库、nlohmann/json header-only | `libdbus-1.so.3`、glibc、libstdc++、libgcc_s |
-| `ble_provisioner` | `ble_core` | `spdlog` 静态库、nlohmann/json header-only | `libdbus-1.so.3`、glibc、libstdc++、libgcc_s |
-| `wd_tx` | `video_transport` | 无额外项目库 | `librockchip_mpp.so.0`、`librga.so.2`、glibc、libstdc++ |
-| `wd_rx` | `video_transport` | 无额外项目库 | `librockchip_mpp.so.0`、`libdrm.so.2`、glibc、libstdc++ |
-
-项目 CMake 默认将 `spdlog` 构建为静态库；`nlohmann/json` 只提供头文件，
-不会产生运行时动态库；`video_transport`、`p2p_core`、`ble_core` 和
-`p2p_app_utils` 也都是项目内部静态库，最终链接进对应可执行文件。
-
-此外，运行时还需要外部进程/服务：`wpa_supplicant`、`bluetoothd`、
-`bluetooth.service` 和 system D-Bus。它们不是由本项目静态链接或打包的库。
 
 ## 目录
 
@@ -158,14 +87,6 @@ cmake --build build-lcat --target wd_rx -j$(nproc)
 - [媒体链路说明](docs/媒体链路使用说明.md)
 
 开发板验证记录保留在本地实验资料中，不纳入公开仓库。
-
-## 当前限制
-
-- 当前媒体传输层是项目自定义 UDP 协议，不是标准 RTP。
-- `p2p_manager` 负责 P2P 链路和静态地址配置；DHCP 由外部部署流程负责。
-- BLE 配置写入后会持久化，运行中模块重载仍需由上层状态机完成。
-- BLE 产品化部署前仍应启用配对/加密、设备验证码和授权校验。
-- 当前主要面向 OPI/RK3588 与 LCAT/RK3576 实验环境。
 
 ## 版本管理
 
