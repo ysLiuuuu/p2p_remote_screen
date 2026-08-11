@@ -6,7 +6,7 @@
 在 OPI 发射端通过 V4L2/RGA/MPP 获取并编码 HDMI 输入，在 LCAT 接收端通过
 MPP/DRM-KMS 解码并输出 HDMI。
 
-当前版本：**0.1.0**（见 [VERSION](VERSION)）
+当前版本：**0.1.5**（见 [VERSION](VERSION)）
 
 ## 功能概览
 
@@ -19,12 +19,42 @@ MPP/DRM-KMS 解码并输出 HDMI。
 
 ## 系统结构
 
-```text
-BLE GATT 配网 ───────┐
-                     ├─ p2p_manager ─ Wi-Fi Direct ─┐
-OPI HDMI-IN → V4L2 → RGA → MPP H.264 → UDP          │
-                                                     ↓
-LCAT HDMI-OUT ← DRM/KMS ← MPP H.264 ← UDP ───────────┘
+```mermaid
+flowchart LR
+    BLE["BLE GATT 配网"]
+    BLUEZ["BlueZ 5.66<br/>system D-Bus"]
+
+    subgraph TX["OPI / RK3588 · 发射端"]
+        TXP2P["p2p_manager<br/>Wi-Fi Direct GO"]
+        IN["HDMI-IN<br/>V4L2 /dev/video0"]
+        RGA["RGA<br/>DMA-BUF → NV12"]
+        ENC["Rockchip MPP<br/>H.264 编码"]
+    end
+
+    subgraph LINK["Wi-Fi Direct IP 链路"]
+        UDP["WDHM UDP<br/>H.264 帧分片 / 重组"]
+    end
+
+    subgraph RX["LCAT / RK3576 · 接收端"]
+        RXP2P["p2p_manager<br/>Wi-Fi Direct GC"]
+        DEC["Rockchip MPP<br/>H.264 解码"]
+        DRM["DRM/KMS<br/>NV12 Plane"]
+        OUT["HDMI-OUT<br/>HDMI-A-1"]
+    end
+
+    BLE <--> BLUEZ
+    BLE --> TXP2P
+    BLE --> RXP2P
+    TXP2P <-->|P2P 建链 / IP 配置| RXP2P
+    TXP2P -. 控制面 .-> UDP
+    IN --> RGA --> ENC --> UDP --> DEC --> DRM --> OUT
+
+    classDef control fill:#e8f1ff,stroke:#3973b8,color:#16324f
+    classDef media fill:#eaf7ee,stroke:#3a8f5b,color:#173d25
+    classDef service fill:#fff4df,stroke:#b87918,color:#4d3108
+    class BLE,TXP2P,RXP2P control
+    class IN,RGA,ENC,UDP,DEC,DRM,OUT media
+    class BLUEZ service
 ```
 
 ## 验证硬件与运行时环境
